@@ -1,0 +1,6 @@
+@hh_napi_HostAddress = http://localhost:5150
+
+GET {{hh_napi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
