@@ -1,10 +1,15 @@
 using hh_napi.Persistence;
 using Microsoft.EntityFrameworkCore;
+using hh_napi.Persistence.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IDataPointRepository, DataPointRepository>();
+builder.Services.AddScoped<IDataSourceRepository, DataSourceRepository>();
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
