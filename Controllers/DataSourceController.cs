@@ -1,6 +1,7 @@
 using hh_napi.Domain;
 using hh_napi.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace hh_napi.Controllers
 {
@@ -29,6 +30,7 @@ namespace hh_napi.Controllers
             return Ok(dataSources);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateDataSource([FromBody] DataSource dataSource)
         {

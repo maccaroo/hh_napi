@@ -9,7 +9,7 @@ namespace hh_napi.Domain
         public int CreatedByUserId { get; set; }
         public DataType Type { get; set; }
 
-        public User CreatedByUser { get; set; } = null!;
+        public User? CreatedByUser { get; set; }
         public List<DataPoint> DataPoints { get; set; } = new();
     }
 
