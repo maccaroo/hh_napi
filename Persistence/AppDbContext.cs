@@ -17,6 +17,7 @@ namespace hh_napi.Persistence
             // Set table schemas
             modelBuilder.HasDefaultSchema("hh");
             modelBuilder.Entity<User>().ToTable("Users", "hh");
+            modelBuilder.Entity<UserCredentials>().ToTable("UserCredentials", "hh");
             modelBuilder.Entity<DataSource>().ToTable("DataSources", "hh");
             modelBuilder.Entity<DataPoint>().ToTable("DataPoints", "hh");
 

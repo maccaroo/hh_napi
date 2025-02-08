@@ -10,5 +10,7 @@ namespace hh_napi.Persistence.Repositories
         void Update(T entity);
         void Delete(T entity);
         Task<bool> SaveChangesAsync();
+
+        IQueryable<T> AsQueryable();
     }
 }

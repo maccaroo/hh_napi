@@ -39,6 +39,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IDataPointRepository, DataPointRepository>();
 builder.Services.AddScoped<IDataSourceRepository, DataSourceRepository>();
+builder.Services.AddScoped<IUserCredentialsRepository, UserCredentialsRepository>();
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDataPointService, DataPointService>();

@@ -6,6 +6,7 @@ namespace hh_napi.Services
     {
         Task<User?> GetUserByIdAsync(int id);
         Task<IEnumerable<User>> GetAllUsersAsync();
-        Task<bool> CreateUserAsync(User user);
+        Task<bool> CreateUserAsync(User user, string password);
+        Task<User?> AuthenticateAsync(string username, string password);
     }
 }

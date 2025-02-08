@@ -2,6 +2,8 @@ using hh_napi.Domain;
 using hh_napi.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using hh_napi.Models;
 
 namespace hh_napi.Controllers
 {
@@ -24,9 +26,9 @@ namespace hh_napi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllDataSources()
+        public async Task<IActionResult> GetAllDataSources([FromQuery] PaginationParams pagination)
         {
-            var dataSources = await _dataSourceService.GetAllDataSourcesAsync();
+            var dataSources = await _dataSourceService.GetAllDataSourcesAsync(pagination);
             return Ok(dataSources);
         }
 
@@ -34,6 +36,15 @@ namespace hh_napi.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateDataSource([FromBody] DataSource dataSource)
         {
+            var userIdClaim = User.FindFirst("userId");
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            dataSource.CreatedByUserId = int.Parse(userIdClaim.Value);
+
+
             var success = await _dataSourceService.CreateDataSourceAsync(dataSource);
             return success ? CreatedAtAction(nameof(GetDataSourceById), new { id = dataSource.Id }, dataSource) : BadRequest();
         }

@@ -20,5 +20,7 @@ namespace hh_napi.Persistence.Repositories
         public void Update(T entity) => _dbSet.Update(entity);
         public void Delete(T entity) => _dbSet.Remove(entity);
         public async Task<bool> SaveChangesAsync() => await _context.SaveChangesAsync() > 0;
+
+        public IQueryable<T> AsQueryable() => _dbSet.AsQueryable();
     }
 }

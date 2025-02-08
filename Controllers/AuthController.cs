@@ -1,3 +1,5 @@
+using hh_napi.Domain;
+using hh_napi.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -10,25 +12,29 @@ namespace hh_napi.Controllers
     [Route("api/auth")]
     public class AuthController : ControllerBase
     {
+        private readonly IUserService _userService;
         private readonly IConfiguration _config;
 
-        public AuthController(IConfiguration config)
+        public AuthController(IUserService userService, IConfiguration config)
         {
+            _userService = userService;
             _config = config;
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginRequest loginRequest)
+        public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
         {
-            if (loginRequest.Username != "admin" || loginRequest.Password != "admin"){
+            User? user = await _userService.AuthenticateAsync(loginRequest.Username, loginRequest.Password);
+            if (user == null)
+            {
                 return Unauthorized();
             }
 
-            var token = GenerateJwtToken(loginRequest.Username);
-            return Ok(new { token = token });
+            var token = GenerateJwtToken(user);
+            return Ok(new { Token = token });
         }
 
-        private string GenerateJwtToken(string username)
+        private string GenerateJwtToken(User user)
         {
             var jwtSettings = _config.GetSection("JwtSettings");
 
@@ -43,7 +49,8 @@ namespace hh_napi.Controllers
 
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, username),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Username),
+                new Claim("userId", user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
@@ -61,7 +68,7 @@ namespace hh_napi.Controllers
 
     public class LoginRequest
     {
-        public string Username { get; set; }
-        public string Password { get; set; }
+        public required string Username { get; set; }
+        public required string Password { get; set; }
     }
 }

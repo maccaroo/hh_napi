@@ -1,4 +1,5 @@
 using hh_napi.Domain;
+using hh_napi.Models;
 using hh_napi.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,10 +31,32 @@ namespace hh_napi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] User user)
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest createUserRequest)
         {
-            var success = await _userService.CreateUserAsync(user);
-            return success ? CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user) : BadRequest();
+            if (string.IsNullOrWhiteSpace(createUserRequest.Password))
+            {
+                return BadRequest("Password is required");
+            }
+
+            if (string.IsNullOrWhiteSpace(createUserRequest.Email))
+            {
+                return BadRequest("Email is required");
+            }
+
+            if (createUserRequest.Password.Length < 8)
+            {
+                return BadRequest("Password must be at least 8 characters long");
+            }
+
+            var user = new User
+            {
+                Username = createUserRequest.Username,
+                Email = createUserRequest.Email
+            };
+            var password = createUserRequest.Password;
+
+            var success = await _userService.CreateUserAsync(user, password);
+            return success ? CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user) : BadRequest("Could not create user.");
         }
     }
 }
