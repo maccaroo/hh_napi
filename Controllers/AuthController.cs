@@ -1,5 +1,5 @@
 using hh_napi.Domain;
-using hh_napi.Services;
+using hh_napi.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

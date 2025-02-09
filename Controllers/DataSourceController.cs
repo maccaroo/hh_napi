@@ -1,9 +1,10 @@
 using hh_napi.Domain;
-using hh_napi.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
 using hh_napi.Models;
+using hh_napi.Services.Interfaces;
+using AutoMapper;
+using hh_napi.Models.Responses;
 
 namespace hh_napi.Controllers
 {
@@ -11,25 +12,28 @@ namespace hh_napi.Controllers
     [Route("api/datasources")]
     public class DataSourceController : ControllerBase
     {
+        private readonly IMapper _mapper;
         private readonly IDataSourceService _dataSourceService;
 
-        public DataSourceController(IDataSourceService dataSourceService)
+        public DataSourceController(IMapper mapper, IDataSourceService dataSourceService)
         {
+            _mapper = mapper;
             _dataSourceService = dataSourceService;
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetDataSourceById(int id)
+        public async Task<IActionResult> GetDataSourceById(int id, [FromQuery] string? includeRelations = null)
         {
-            var dataSource = await _dataSourceService.GetDataSourceByIdAsync(id);
-            return dataSource != null ? Ok(dataSource) : NotFound();
+            var dataSource = await _dataSourceService.GetDataSourceByIdAsync(id, includeRelations);
+            return dataSource != null ? Ok(_mapper.Map<DataSourceResponse>(dataSource)) : NotFound();
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllDataSources([FromQuery] PaginationParams pagination)
+        public async Task<IActionResult> GetAllDataSources([FromQuery] PaginationParams pagination, [FromQuery] string? includeRelations = null)
         {
-            var dataSources = await _dataSourceService.GetAllDataSourcesAsync(pagination);
-            return Ok(dataSources);
+            var dataSources = await _dataSourceService.GetAllDataSourcesAsync(pagination, includeRelations);
+            var response = _mapper.Map<IEnumerable<DataSourceResponse>>(dataSources);
+            return Ok(response);
         }
 
         [Authorize]
@@ -46,7 +50,7 @@ namespace hh_napi.Controllers
 
 
             var success = await _dataSourceService.CreateDataSourceAsync(dataSource);
-            return success ? CreatedAtAction(nameof(GetDataSourceById), new { id = dataSource.Id }, dataSource) : BadRequest();
+            return success ? CreatedAtAction(nameof(GetDataSourceById), new { id = dataSource.Id }, _mapper.Map<DataSourceResponse>(dataSource)) : BadRequest();
         }
     }
 }

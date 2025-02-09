@@ -2,6 +2,8 @@ using hh_napi.Domain;
 using hh_napi.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using hh_napi.Utils;
+using hh_napi.Services.Interfaces;
+using hh_napi.Models;
 
 namespace hh_napi.Services
 {
@@ -16,8 +18,41 @@ namespace hh_napi.Services
             _userCredentialsRepository = userCredentialsRepository;
         }
 
-        public async Task<User?> GetUserByIdAsync(int id) => await _userRepository.GetByIdAsync(id);
-        public async Task<IEnumerable<User>> GetAllUsersAsync() => await _userRepository.GetAllAsync();
+        public async Task<User?> GetUserByIdAsync(int id, string? includeRelations = null)
+        {
+            var query = _userRepository.AsQueryable().AsNoTracking();
+
+            if (!string.IsNullOrEmpty(includeRelations))
+            {
+                var relations = includeRelations.Split(',');
+                foreach (var relation in relations)
+                {
+                    query = query.Include(relation.Trim());
+                }
+            }
+
+            return await query.FirstOrDefaultAsync(u => u.Id == id);
+        }
+        public async Task<IEnumerable<User>> GetAllUsersAsync(PaginationParams pagination, string? includeRelations = null)
+        {
+            var query = _userRepository.AsQueryable().AsNoTracking();
+
+            if (!string.IsNullOrEmpty(pagination.Search))
+            {
+                query = query.Where(u => u.Username.Contains(pagination.Search));
+            }
+
+            if (!string.IsNullOrEmpty(includeRelations))
+            {
+                var relations = includeRelations.Split(',');
+                foreach (var relation in relations)
+                {
+                    query = query.Include(relation.Trim());
+                }
+            }
+
+            return await query.ToListAsync();
+        }
 
         public async Task<bool> CreateUserAsync(User user, string password)
         {

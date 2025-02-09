@@ -1,6 +1,9 @@
+using AutoMapper;
 using hh_napi.Domain;
 using hh_napi.Models;
+using hh_napi.Models.Responses;
 using hh_napi.Services;
+using hh_napi.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace hh_napi.Controllers
@@ -9,25 +12,28 @@ namespace hh_napi.Controllers
     [Route("api/users")]
     public class UserController : ControllerBase
     {
+        private readonly IMapper _mapper;
         private readonly IUserService _userService;
 
-        public UserController(IUserService userService)
+        public UserController(IMapper mapper, IUserService userService)
         {
+            _mapper = mapper;
             _userService = userService;
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetUserById(int id)
+        public async Task<IActionResult> GetUserById(int id, [FromQuery] string? includeRelations = null)
         {
-            var user = await _userService.GetUserByIdAsync(id);
-            return user != null ? Ok(user) : NotFound();
+            var user = await _userService.GetUserByIdAsync(id, includeRelations);
+            return user != null ? Ok(_mapper.Map<UserResponse>(user)) : NotFound();
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllUsers()
+        public async Task<IActionResult> GetAllUsers([FromQuery] PaginationParams pagination, [FromQuery] string? includeRelations = null)
         {
-            var users = await _userService.GetAllUsersAsync();
-            return Ok(users);
+            var users = await _userService.GetAllUsersAsync(pagination, includeRelations);
+            var response = _mapper.Map<IEnumerable<UserResponse>>(users);
+            return Ok(response);
         }
 
         [HttpPost]
