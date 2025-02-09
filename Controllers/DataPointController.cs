@@ -21,9 +21,9 @@ namespace hh_napi.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetDataPointById(int dataSourceId, int id)
+        public async Task<IActionResult> GetDataPointById(int dataSourceId, int id, [FromQuery] string? includeRelations = null)
         {
-            var dataPoint = await _dataPointService.GetDataPointByIdAsync(id);
+            var dataPoint = await _dataPointService.GetDataPointByIdAsync(id, includeRelations);
             return dataPoint != null ? Ok(_mapper.Map<DataPointResponse>(dataPoint)) : NotFound();
         }
 

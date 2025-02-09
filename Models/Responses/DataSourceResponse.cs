@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using hh_napi.Domain;
 
 namespace hh_napi.Models.Responses
@@ -10,5 +11,9 @@ namespace hh_napi.Models.Responses
         public DateTime CreatedAt { get; set; }
         public int CreatedByUserId { get; set; }
         public DataType Type { get; set; }
+
+        // Optional properties
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public UserResponse? CreatedByUser { get; set; }
     }
 } 

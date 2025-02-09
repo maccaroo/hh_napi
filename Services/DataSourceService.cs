@@ -2,60 +2,40 @@ using hh_napi.Domain;
 using hh_napi.Models;
 using hh_napi.Models.Responses;
 using hh_napi.Persistence.Repositories;
+using hh_napi.Persistence.Repositories.Interfaces;
 using hh_napi.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace hh_napi.Services
+namespace hh_napi.Services;
+
+public class DataSourceService : BaseService<DataSource>, IDataSourceService
 {
-    public class DataSourceService : BaseService<DataSource>, IDataSourceService
+    private readonly IDataSourceRepository _dataSourceRepository;
+
+    public DataSourceService(IDataSourceRepository dataSourceRepository)
     {
-        private readonly IDataSourceRepository _dataSourceRepository;
+        _dataSourceRepository = dataSourceRepository;
+    }
 
-        public DataSourceService(IDataSourceRepository dataSourceRepository)
-        {
-            _dataSourceRepository = dataSourceRepository;
-        }
+    public async Task<DataSource?> GetDataSourceByIdAsync(int id, string? includeRelations = null)
+    {
+        var query = _dataSourceRepository.AsQueryable().AsNoTracking();
+        query = ApplyIncludes(query, includeRelations);
 
-        public async Task<DataSource?> GetDataSourceByIdAsync(int id, string? includeRelations = null)
-        {
-            var query = _dataSourceRepository.AsQueryable().AsNoTracking();
+        return await query.FirstOrDefaultAsync(ds => ds.Id == id);
+    }
+    public async Task<PagedResponse<DataSource>> GetAllDataSourcesAsync(PaginationParams pagination, string? includeRelations = null)
+    {
+        var query = _dataSourceRepository.AsQueryable().AsNoTracking();
+        query = ApplyIncludes(query, includeRelations);
+        query = ApplySearch(query, pagination.Search);
 
-            if (!string.IsNullOrEmpty(includeRelations))
-            {
-                var relations = includeRelations.Split(',');
-                foreach (var relation in relations)
-                {
-                    query = query.Include(relation.Trim());
-                }
-            }
+        return await GetPagedResponseAsync(query, pagination.Offset, pagination.Limit);
+    }
 
-            return await query.FirstOrDefaultAsync(ds => ds.Id == id);
-        }
-        public async Task<PagedResponse<DataSource>> GetAllDataSourcesAsync(PaginationParams pagination, string? includeRelations = null)
-        {
-            var query = _dataSourceRepository.AsQueryable().AsNoTracking();
-
-            if (!string.IsNullOrEmpty(pagination.Search))
-            {
-                query = query.Where(ds => ds.Name.Contains(pagination.Search) || ds.Description.Contains(pagination.Search));
-            }
-
-            if (!string.IsNullOrEmpty(includeRelations))
-            {
-                var relations = includeRelations.Split(',');
-                foreach (var relation in relations)
-                {
-                    query = query.Include(relation.Trim());
-                }
-            }
-
-            return await GetPagedResponseAsync(query, pagination.Offset, pagination.Limit);
-        }
-
-        public async Task<bool> CreateDataSourceAsync(DataSource dataSource)
-        {
-            await _dataSourceRepository.AddAsync(dataSource);
-            return await _dataSourceRepository.SaveChangesAsync();
-        }
+    public async Task<bool> CreateDataSourceAsync(DataSource dataSource)
+    {
+        await _dataSourceRepository.AddAsync(dataSource);
+        return await _dataSourceRepository.SaveChangesAsync();
     }
 }

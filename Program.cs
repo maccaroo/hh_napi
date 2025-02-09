@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using hh_napi.Mappings;
 using hh_napi.Services.Interfaces;
+using hh_napi.Persistence.Repositories.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
