@@ -30,9 +30,8 @@ namespace hh_napi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllDataPoints(int dataSourceId, [FromQuery] PaginationParams pagination)
         {
-            var dataPoints = await _dataPointService.GetAllDataPointsAsync(dataSourceId, pagination);
-            var response = _mapper.Map<IEnumerable<DataPointResponse>>(dataPoints);
-            return Ok(response);
+            var pagedDataPoints = await _dataPointService.GetAllDataPointsAsync(dataSourceId, pagination);
+            return Ok(pagedDataPoints.ConvertTo<DataPointResponse>(_mapper));
         }
 
         [HttpPost]

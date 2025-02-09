@@ -31,9 +31,8 @@ namespace hh_napi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllDataSources([FromQuery] PaginationParams pagination, [FromQuery] string? includeRelations = null)
         {
-            var dataSources = await _dataSourceService.GetAllDataSourcesAsync(pagination, includeRelations);
-            var response = _mapper.Map<IEnumerable<DataSourceResponse>>(dataSources);
-            return Ok(response);
+            var pagedDataSources = await _dataSourceService.GetAllDataSourcesAsync(pagination, includeRelations);
+            return Ok(pagedDataSources.ConvertTo<DataSourceResponse>(_mapper));
         }
 
         [Authorize]

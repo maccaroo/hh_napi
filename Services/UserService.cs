@@ -4,10 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using hh_napi.Utils;
 using hh_napi.Services.Interfaces;
 using hh_napi.Models;
+using hh_napi.Models.Responses;
 
 namespace hh_napi.Services
 {
-    public class UserService : IUserService
+    public class UserService : BaseService<User>, IUserService
     {
         private readonly IUserRepository _userRepository;
         private readonly IUserCredentialsRepository _userCredentialsRepository;
@@ -33,7 +34,7 @@ namespace hh_napi.Services
 
             return await query.FirstOrDefaultAsync(u => u.Id == id);
         }
-        public async Task<IEnumerable<User>> GetAllUsersAsync(PaginationParams pagination, string? includeRelations = null)
+        public async Task<PagedResponse<User>> GetAllUsersAsync(PaginationParams pagination, string? includeRelations = null)
         {
             var query = _userRepository.AsQueryable().AsNoTracking();
 
@@ -51,7 +52,7 @@ namespace hh_napi.Services
                 }
             }
 
-            return await query.ToListAsync();
+            return await GetPagedResponseAsync(query, pagination.Offset, pagination.Limit);
         }
 
         public async Task<bool> CreateUserAsync(User user, string password)

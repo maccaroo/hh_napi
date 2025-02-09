@@ -31,9 +31,8 @@ namespace hh_napi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllUsers([FromQuery] PaginationParams pagination, [FromQuery] string? includeRelations = null)
         {
-            var users = await _userService.GetAllUsersAsync(pagination, includeRelations);
-            var response = _mapper.Map<IEnumerable<UserResponse>>(users);
-            return Ok(response);
+            var pagedUsers = await _userService.GetAllUsersAsync(pagination, includeRelations);
+            return Ok(pagedUsers.ConvertTo<UserResponse>(_mapper));
         }
 
         [HttpPost]
