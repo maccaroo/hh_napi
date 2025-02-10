@@ -12,8 +12,8 @@ public class UserService : BaseService<User>, IUserService
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserCredentialsRepository _userCredentialsRepository;
-    
-    public UserService(IUserRepository userRepository, IUserCredentialsRepository userCredentialsRepository)
+
+    public UserService(IUserRepository userRepository, IUserCredentialsRepository userCredentialsRepository, ILogger<BaseService<User>> logger) : base(logger)
     {
         _userRepository = userRepository;
         _userCredentialsRepository = userCredentialsRepository;

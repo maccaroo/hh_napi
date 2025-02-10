@@ -10,6 +10,13 @@ namespace hh_napi.Services;
 
 public abstract class BaseService<T> where T : class
 {
+    protected readonly ILogger<BaseService<T>> _logger;
+
+    protected BaseService(ILogger<BaseService<T>> logger)
+    {
+        _logger = logger;
+    }
+
     protected IQueryable<T> ApplyIncludes(IQueryable<T> query, string? includeRelations = null)
     {
         if (!string.IsNullOrEmpty(includeRelations))
@@ -71,7 +78,7 @@ public abstract class BaseService<T> where T : class
         }
         else
         {
-            throw new InvalidOperationException($"No default ordering field defined for {typeof(T).Name}.  Add [DefaultOrderBy] to a property.");
+            _logger.LogWarning($"No default ordering field defined for {typeof(T).Name}.  Add [DefaultOrderBy] to a property.");
         }
 
         var total = query.Count();

@@ -11,7 +11,7 @@ public class DataPointService : BaseService<DataPoint>, IDataPointService
 {
     private readonly IDataPointRepository _dataPointRepository;
 
-    public DataPointService(IDataPointRepository dataPointRepository)
+    public DataPointService(IDataPointRepository dataPointRepository, ILogger<BaseService<DataPoint>> logger) : base(logger)
     {
         _dataPointRepository = dataPointRepository;
     }

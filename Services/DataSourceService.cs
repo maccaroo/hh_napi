@@ -1,7 +1,6 @@
 using hh_napi.Domain;
 using hh_napi.Models;
 using hh_napi.Models.Responses;
-using hh_napi.Persistence.Repositories;
 using hh_napi.Persistence.Repositories.Interfaces;
 using hh_napi.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -11,12 +10,10 @@ namespace hh_napi.Services;
 public class DataSourceService : BaseService<DataSource>, IDataSourceService
 {
     private readonly IDataSourceRepository _dataSourceRepository;
-    private readonly ILogger<DataSourceService> _logger;
 
-    public DataSourceService(IDataSourceRepository dataSourceRepository, ILogger<DataSourceService> logger)
+    public DataSourceService(IDataSourceRepository dataSourceRepository, ILogger<BaseService<DataSource>> logger) : base(logger)
     {
         _dataSourceRepository = dataSourceRepository;
-        _logger = logger;
     }
 
     public async Task<DataSource?> GetDataSourceByIdAsync(int id, string? includeRelations = null)
