@@ -38,7 +38,7 @@ public class DataSourceService : BaseService<DataSource>, IDataSourceService
         query = ApplyIncludes(query, includeRelations);
         query = ApplySearch(query, pagination.Search);
 
-        return await GetPagedResponseAsync(query, pagination.Offset, pagination.Limit);
+        return await GetPagedResponseAsync(query, pagination);
     }
 
     public async Task<bool> CreateDataSourceAsync(DataSource dataSource)

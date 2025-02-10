@@ -6,6 +6,8 @@ namespace hh_napi.Domain
     {
         public int Id { get; set; }
         public int DataSourceId { get; set; }
+
+        [DefaultOrderBy]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         
         [Searchable]

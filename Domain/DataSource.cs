@@ -11,6 +11,8 @@ namespace hh_napi.Domain
 
         [Searchable]
         public string Description { get; set; } = string.Empty;
+
+        [DefaultOrderBy]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public int CreatedByUserId { get; set; }
         public DataType Type { get; set; }

@@ -29,7 +29,7 @@ public class DataPointService : BaseService<DataPoint>, IDataPointService
         query = ApplyIncludes(query, includeRelations);
         query = ApplySearch(query, pagination.Search);
 
-        return await GetPagedResponseAsync(query, pagination.Offset, pagination.Limit);
+        return await GetPagedResponseAsync(query, pagination);
     }
 
     public async Task<bool> CreateDataPointAsync(DataPoint dataPoint)

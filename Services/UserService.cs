@@ -32,7 +32,7 @@ public class UserService : BaseService<User>, IUserService
         query = ApplyIncludes(query, includeRelations);
         query = ApplySearch(query, pagination.Search);
 
-        return await GetPagedResponseAsync(query, pagination.Offset, pagination.Limit);
+        return await GetPagedResponseAsync(query, pagination);
     }
 
     public async Task<bool> CreateUserAsync(User user, string password)
