@@ -11,18 +11,26 @@ namespace hh_napi.Services;
 public class DataSourceService : BaseService<DataSource>, IDataSourceService
 {
     private readonly IDataSourceRepository _dataSourceRepository;
+    private readonly ILogger<DataSourceService> _logger;
 
-    public DataSourceService(IDataSourceRepository dataSourceRepository)
+    public DataSourceService(IDataSourceRepository dataSourceRepository, ILogger<DataSourceService> logger)
     {
         _dataSourceRepository = dataSourceRepository;
+        _logger = logger;
     }
 
     public async Task<DataSource?> GetDataSourceByIdAsync(int id, string? includeRelations = null)
     {
         var query = _dataSourceRepository.AsQueryable().AsNoTracking();
         query = ApplyIncludes(query, includeRelations);
+        var dataSource = await query.FirstOrDefaultAsync(ds => ds.Id == id);
+        
+        if (dataSource == null)
+        {
+            _logger.LogWarning($"DataSource with id {id} not found");
+        }
 
-        return await query.FirstOrDefaultAsync(ds => ds.Id == id);
+        return dataSource;
     }
     public async Task<PagedResponse<DataSource>> GetAllDataSourcesAsync(PaginationParams pagination, string? includeRelations = null)
     {

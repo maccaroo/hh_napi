@@ -14,11 +14,13 @@ namespace hh_napi.Controllers
     {
         private readonly IUserService _userService;
         private readonly IConfiguration _config;
+        private readonly ILogger<AuthController> _logger;
 
-        public AuthController(IUserService userService, IConfiguration config)
+        public AuthController(IUserService userService, IConfiguration config, ILogger<AuthController> logger)
         {
             _userService = userService;
             _config = config;
+            _logger = logger;
         }
 
         [HttpPost("login")]
@@ -27,10 +29,13 @@ namespace hh_napi.Controllers
             User? user = await _userService.AuthenticateAsync(loginRequest.Username, loginRequest.Password);
             if (user == null)
             {
+                _logger.LogWarning("Login attempt failed for username {Username}", loginRequest.Username);
                 return Unauthorized();
             }
 
             var token = GenerateJwtToken(user);
+            _logger.LogInformation("Login successful for username {Username}", loginRequest.Username);
+
             return Ok(new { Token = token });
         }
 

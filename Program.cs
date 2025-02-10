@@ -8,6 +8,7 @@ using System.Text;
 using hh_napi.Mappings;
 using hh_napi.Services.Interfaces;
 using hh_napi.Persistence.Repositories.Interfaces;
+using hh_napi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,6 +59,7 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 
