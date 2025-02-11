@@ -10,25 +10,23 @@ namespace hh_napi.Services;
 
 public class UserService : BaseService<User>, IUserService
 {
-    private readonly IUserRepository _userRepository;
-    private readonly IUserCredentialsRepository _userCredentialsRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UserService(IUserRepository userRepository, IUserCredentialsRepository userCredentialsRepository, ILogger<BaseService<User>> logger) : base(logger)
+    public UserService(IUnitOfWork unitOfWork, ILogger<BaseService<User>> logger) : base(logger)
     {
-        _userRepository = userRepository;
-        _userCredentialsRepository = userCredentialsRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<User?> GetUserByIdAsync(int id, string? includeRelations = null)
     {
-        var query = _userRepository.AsQueryable().AsNoTracking();
+        var query = _unitOfWork.Users.AsQueryable().AsNoTracking();
         query = ApplyIncludes(query, includeRelations);
 
         return await query.FirstOrDefaultAsync(u => u.Id == id);
     }
     public async Task<PagedResponse<User>> GetAllUsersAsync(PaginationParams pagination, string? includeRelations = null)
     {
-        var query = _userRepository.AsQueryable().AsNoTracking();
+        var query = _unitOfWork.Users.AsQueryable().AsNoTracking();
         query = ApplyIncludes(query, includeRelations);
         query = ApplySearch(query, pagination.Search);
 
@@ -40,8 +38,8 @@ public class UserService : BaseService<User>, IUserService
         var (hash, salt) = PasswordHasher.HashPassword(password);
 
 
-        await _userRepository.AddAsync(user);
-        await _userRepository.SaveChangesAsync();
+        await _unitOfWork.Users.AddAsync(user);
+        await _unitOfWork.SaveChangesAsync();
 
         var userCredentials = new UserCredentials
         {
@@ -50,20 +48,20 @@ public class UserService : BaseService<User>, IUserService
             Salt = salt
         };
 
-        await _userCredentialsRepository.AddAsync(userCredentials);
-        return await _userCredentialsRepository.SaveChangesAsync();
+        await _unitOfWork.UserCredentials.AddAsync(userCredentials);
+        return await _unitOfWork.UserCredentials.SaveChangesAsync();
     }
 
     public async Task<User?> AuthenticateAsync(string username, string password)
     {
-        var user = await _userRepository.AsQueryable()
+        var user = await _unitOfWork.Users.AsQueryable()
             .FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower());
         if (user == null)
         {
             return null;
         }
 
-        var userCredentials = await _userCredentialsRepository.AsQueryable()
+        var userCredentials = await _unitOfWork.UserCredentials.AsQueryable()
             .FirstOrDefaultAsync(uc => uc.UserId == user.Id);
 
         if (userCredentials == null || !PasswordHasher.VerifyPassword(password, userCredentials.PasswordHash, userCredentials.Salt))
@@ -76,6 +74,6 @@ public class UserService : BaseService<User>, IUserService
 
     public async Task<User?> GetUserByUsernameAsync(string username)
     {
-        return await _userRepository.AsQueryable().FirstOrDefaultAsync(u => u.Username == username);
+        return await _unitOfWork.Users.AsQueryable().FirstOrDefaultAsync(u => u.Username == username);
     }
 }

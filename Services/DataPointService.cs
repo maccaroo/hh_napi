@@ -9,23 +9,23 @@ namespace hh_napi.Services;
 
 public class DataPointService : BaseService<DataPoint>, IDataPointService
 {
-    private readonly IDataPointRepository _dataPointRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public DataPointService(IDataPointRepository dataPointRepository, ILogger<BaseService<DataPoint>> logger) : base(logger)
+    public DataPointService(IUnitOfWork unitOfWork, ILogger<BaseService<DataPoint>> logger) : base(logger)
     {
-        _dataPointRepository = dataPointRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<DataPoint?> GetDataPointByIdAsync(int id, string? includeRelations = null)
     {
-        var query = _dataPointRepository.AsQueryable().AsNoTracking();
+        var query = _unitOfWork.DataPoints.AsQueryable().AsNoTracking();
         query = ApplyIncludes(query, includeRelations);
 
         return await query.FirstOrDefaultAsync(dp => dp.Id == id);
     }
     public async Task<PagedResponse<DataPoint>> GetAllDataPointsAsync(int dataSourceId, PaginationParams pagination, string? includeRelations = null)
     {
-        var query = _dataPointRepository.AsQueryable().AsNoTracking();
+        var query = _unitOfWork.DataPoints.AsQueryable().AsNoTracking();
         query = ApplyIncludes(query, includeRelations);
         query = ApplySearch(query, pagination.Search);
 
@@ -34,7 +34,7 @@ public class DataPointService : BaseService<DataPoint>, IDataPointService
 
     public async Task<bool> CreateDataPointAsync(DataPoint dataPoint)
     {
-        await _dataPointRepository.AddAsync(dataPoint);
-        return await _dataPointRepository.SaveChangesAsync();
+        await _unitOfWork.DataPoints.AddAsync(dataPoint);
+        return await _unitOfWork.SaveChangesAsync();
     }
 }

@@ -21,6 +21,9 @@ public static class ServiceConfiguration
         services.AddScoped<IDataSourceRepository, DataSourceRepository>();
         services.AddScoped<IUserCredentialsRepository, UserCredentialsRepository>();
 
+        // UnitOfWork
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+
         // Services
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IDataPointService, DataPointService>();

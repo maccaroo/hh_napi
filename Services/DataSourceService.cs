@@ -9,16 +9,16 @@ namespace hh_napi.Services;
 
 public class DataSourceService : BaseService<DataSource>, IDataSourceService
 {
-    private readonly IDataSourceRepository _dataSourceRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public DataSourceService(IDataSourceRepository dataSourceRepository, ILogger<BaseService<DataSource>> logger) : base(logger)
+    public DataSourceService(IUnitOfWork unitOfWork, ILogger<BaseService<DataSource>> logger) : base(logger)
     {
-        _dataSourceRepository = dataSourceRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<DataSource?> GetDataSourceByIdAsync(int id, string? includeRelations = null)
     {
-        var query = _dataSourceRepository.AsQueryable().AsNoTracking();
+        var query = _unitOfWork.DataSources.AsQueryable().AsNoTracking();
         query = ApplyIncludes(query, includeRelations);
         var dataSource = await query.FirstOrDefaultAsync(ds => ds.Id == id);
         
@@ -31,7 +31,7 @@ public class DataSourceService : BaseService<DataSource>, IDataSourceService
     }
     public async Task<PagedResponse<DataSource>> GetAllDataSourcesAsync(PaginationParams pagination, string? includeRelations = null)
     {
-        var query = _dataSourceRepository.AsQueryable().AsNoTracking();
+        var query = _unitOfWork.DataSources.AsQueryable().AsNoTracking();
         query = ApplyIncludes(query, includeRelations);
         query = ApplySearch(query, pagination.Search);
 
@@ -40,7 +40,7 @@ public class DataSourceService : BaseService<DataSource>, IDataSourceService
 
     public async Task<bool> CreateDataSourceAsync(DataSource dataSource)
     {
-        await _dataSourceRepository.AddAsync(dataSource);
-        return await _dataSourceRepository.SaveChangesAsync();
+        await _unitOfWork.DataSources.AddAsync(dataSource);
+        return await _unitOfWork.SaveChangesAsync();
     }
 }
