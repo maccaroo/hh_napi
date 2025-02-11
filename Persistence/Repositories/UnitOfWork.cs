@@ -5,6 +5,7 @@ namespace hh_napi.Persistence.Repositories;
 public class UnitOfWork : IUnitOfWork
 {
     private readonly AppDbContext _context;
+    private bool _disposed = false;
 
     public IDataPointRepository DataPoints { get; }
     public IDataSourceRepository DataSources { get; }
@@ -33,7 +34,23 @@ public class UnitOfWork : IUnitOfWork
 
     public void Dispose()
     {
-        _context.Dispose();
-        GC.SuppressFinalize(this);
+        Dispose(true);
+        GC.SuppressFinalize(this);  // Avoid unnecessary finalization
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed) // Prevent multiple disposals
+        {
+            if (disposing)
+            {
+                // Dispose managed resources here
+                _context.Dispose();
+            }
+
+            // Dispose unmanaged resources here
+
+            _disposed = true;
+        }
     }
 }
