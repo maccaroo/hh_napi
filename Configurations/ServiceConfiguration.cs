@@ -1,4 +1,7 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using hh_napi.Mappings;
+using hh_napi.Models.Validators;
 using hh_napi.Persistence.Repositories;
 using hh_napi.Persistence.Repositories.Interfaces;
 using hh_napi.Services;
@@ -11,9 +14,17 @@ public static class ServiceConfiguration
     public static void ConfigureServices(this WebApplicationBuilder builder)
     {
         var services = builder.Services;
-        
+
+        // Settings
+        services.Configure<ValidationSettings>(builder.Configuration.GetSection("Validation"));
+
         // Controllers
         services.AddControllers();
+
+        // FluentValidation
+        services.AddFluentValidationAutoValidation()
+                .AddFluentValidationClientsideAdapters();
+        services.AddValidatorsFromAssemblyContaining<CreateUserRequestValidator>();
 
         // Repositories
         services.AddScoped<IUserRepository, UserRepository>();

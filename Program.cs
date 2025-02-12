@@ -9,10 +9,5 @@ builder.ConfigureServices();
 
 var app = builder.Build();
 app.ConfigureMiddleware();
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-app.UseHttpsRedirection();
 app.MapControllers();
 app.Run();
