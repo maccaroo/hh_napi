@@ -19,12 +19,6 @@ public class ExceptionHandlingMiddleware
         try
         {
             await _next(context);
-
-            if (context.Response.StatusCode == (int)HttpStatusCode.NotFound)
-            {
-                _logger.LogWarning("Not found: {Path}", context.Request.Path);
-                await HandleExceptionAsync(context, HttpStatusCode.NotFound, "Not found");
-            }
         }
         catch (Exception ex)
         {
