@@ -13,10 +13,27 @@ public static class ServiceConfiguration
 {
     public static void ConfigureServices(this WebApplicationBuilder builder)
     {
+        var angularClientSettings = builder.Configuration.GetSection("AngularClient");
+        var url = angularClientSettings["Url"];
+        if (string.IsNullOrEmpty(url))
+        {
+            throw new InvalidOperationException("Angular client URL is missing from the configuration.");
+        }
+
         var services = builder.Services;
 
         // Settings
         services.Configure<ValidationSettings>(builder.Configuration.GetSection("Validation"));
+
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAngularApp", builder => builder
+                .WithOrigins(url)
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials()
+            );
+        });
 
         // Controllers
         services.AddControllers();

@@ -30,6 +30,9 @@ public static class MiddlewareConfiguration
         // Logging
         app.UseSerilogRequestLogging(); // Logs requests at the start for tracking.
 
+        // CORS
+        app.UseCors("AllowAngularApp");
+
         // Redirect to HTTPS
         app.UseHttpsRedirection();  // Ensures all requests are redirected to HTTPS before anything else
         
