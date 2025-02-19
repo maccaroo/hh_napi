@@ -51,5 +51,12 @@ namespace hh_napi.Controllers
             var success = await _dataSourceService.CreateDataSourceAsync(dataSource);
             return success ? CreatedAtAction(nameof(GetDataSourceById), new { id = dataSource.Id }, _mapper.Map<DataSourceResponse>(dataSource)) : BadRequest();
         }
+
+        [HttpGet("{id}/summary")]
+        public async Task<IActionResult> GetDataSourceSummary(int id)
+        {
+            var dataSourceSummary = await _dataSourceService.GetDataSourceSummaryAsync(id);
+            return dataSourceSummary != null ? Ok(_mapper.Map<DataSourceSummaryResponse>(dataSourceSummary)) : NotFound();
+        }
     }
 }

@@ -5,16 +5,19 @@ using hh_napi.Attributes;
 using System.Reflection;
 using hh_napi.Models;
 using System.Linq.Expressions;
+using hh_napi.Persistence.Repositories.Interfaces;
 
 namespace hh_napi.Services;
 
 public abstract class BaseService<T> where T : class
 {
     protected readonly ILogger<BaseService<T>> _logger;
+    protected readonly IUnitOfWork _unitOfWork;
 
-    protected BaseService(ILogger<BaseService<T>> logger)
+    protected BaseService(ILogger<BaseService<T>> logger, IUnitOfWork unitOfWork)
     {
         _logger = logger;
+        _unitOfWork = unitOfWork;
     }
 
     protected IQueryable<T> ApplyIncludes(IQueryable<T> query, string? includeRelations = null)

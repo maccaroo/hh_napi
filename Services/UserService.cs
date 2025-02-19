@@ -10,12 +10,8 @@ namespace hh_napi.Services;
 
 public class UserService : BaseService<User>, IUserService
 {
-    private readonly IUnitOfWork _unitOfWork;
 
-    public UserService(IUnitOfWork unitOfWork, ILogger<BaseService<User>> logger) : base(logger)
-    {
-        _unitOfWork = unitOfWork;
-    }
+    public UserService(IUnitOfWork unitOfWork, ILogger<BaseService<User>> logger) : base(logger, unitOfWork){}
 
     public async Task<User?> GetUserByIdAsync(int id, string? includeRelations = null)
     {

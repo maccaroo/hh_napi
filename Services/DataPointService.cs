@@ -9,12 +9,8 @@ namespace hh_napi.Services;
 
 public class DataPointService : BaseService<DataPoint>, IDataPointService
 {
-    private readonly IUnitOfWork _unitOfWork;
 
-    public DataPointService(IUnitOfWork unitOfWork, ILogger<BaseService<DataPoint>> logger) : base(logger)
-    {
-        _unitOfWork = unitOfWork;
-    }
+    public DataPointService(IUnitOfWork unitOfWork, ILogger<BaseService<DataPoint>> logger) : base(logger, unitOfWork) { }
 
     public async Task<DataPoint?> GetDataPointByIdAsync(int id, string? includeRelations = null)
     {
@@ -26,6 +22,8 @@ public class DataPointService : BaseService<DataPoint>, IDataPointService
     public async Task<PagedResponse<DataPoint>> GetAllDataPointsAsync(int dataSourceId, PaginationParams pagination, string? includeRelations = null)
     {
         var query = _unitOfWork.DataPoints.AsQueryable().AsNoTracking();
+        query = query.Where(dp => dp.DataSourceId == dataSourceId);
+
         query = ApplyIncludes(query, includeRelations);
         query = ApplySearch(query, pagination.Search);
 

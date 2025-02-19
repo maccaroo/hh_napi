@@ -9,4 +9,5 @@ public interface IDataSourceService
     Task<DataSource?> GetDataSourceByIdAsync(int id, string? includeRelations = null);
     Task<PagedResponse<DataSource>> GetAllDataSourcesAsync(PaginationParams pagination, string? includeRelations = null);
     Task<bool> CreateDataSourceAsync(DataSource dataSource);
+    Task<DataSourceSummary> GetDataSourceSummaryAsync(int id);
 }
