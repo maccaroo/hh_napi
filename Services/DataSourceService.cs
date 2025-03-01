@@ -12,7 +12,7 @@ public class DataSourceService : BaseService<DataSource>, IDataSourceService
 {
 
 
-    public DataSourceService(IUnitOfWork unitOfWork, ILogger<BaseService<DataSource>> logger) : base(logger, unitOfWork){}
+    public DataSourceService(IUnitOfWork unitOfWork, ILogger<BaseService<DataSource>> logger) : base(logger, unitOfWork) { }
 
     public async Task<DataSource?> GetDataSourceByIdAsync(int id, string? includeRelations = null)
     {
@@ -57,5 +57,18 @@ public class DataSourceService : BaseService<DataSource>, IDataSourceService
             DataPointsCount = dataPointsCount,
             DataPointsLastAdded = dataPointsLastAdded
         };
+    }
+    
+    public async Task<bool> DeleteDataSourceAsync(int id)
+    {
+        var dataSource = await _unitOfWork.DataSources.GetByIdAsync(id);
+        if (dataSource == null)
+        {
+            _logger.LogWarning("DataSource with id {Id} not found", id);
+            return false;
+        }
+
+        _unitOfWork.DataSources.Delete(dataSource);
+        return await _unitOfWork.SaveChangesAsync();
     }
 }

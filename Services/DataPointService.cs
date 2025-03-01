@@ -35,4 +35,17 @@ public class DataPointService : BaseService<DataPoint>, IDataPointService
         await _unitOfWork.DataPoints.AddAsync(dataPoint);
         return await _unitOfWork.SaveChangesAsync();
     }
+
+    public async Task<bool> DeleteDataPointAsync(int id)
+    {
+        var dataPoint = await _unitOfWork.DataPoints.GetByIdAsync(id);
+        if (dataPoint == null)
+        {
+            _logger.LogWarning("DataPoint with id {Id} not found", id);
+            return false;
+        }
+
+        _unitOfWork.DataPoints.Delete(dataPoint);
+        return await _unitOfWork.SaveChangesAsync();
+    }
 }

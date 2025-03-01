@@ -58,5 +58,12 @@ namespace hh_napi.Controllers
             var dataSourceSummary = await _dataSourceService.GetDataSourceSummaryAsync(id);
             return dataSourceSummary != null ? Ok(_mapper.Map<DataSourceSummaryResponse>(dataSourceSummary)) : NotFound();
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteDataSource(int id)
+        {
+            var success = await _dataSourceService.DeleteDataSourceAsync(id);
+            return success ? NoContent() : BadRequest();
+        }
     }
 }

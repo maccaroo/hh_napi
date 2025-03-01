@@ -9,4 +9,5 @@ public interface IDataPointService
     Task<DataPoint?> GetDataPointByIdAsync(int id, string? includeRelations = null);
     Task<PagedResponse<DataPoint>> GetAllDataPointsAsync(int dataSourceId, PaginationParams pagination, string? includeRelations = null);
     Task<bool> CreateDataPointAsync(DataPoint dataPoint);
+    Task<bool> DeleteDataPointAsync(int id);
 }

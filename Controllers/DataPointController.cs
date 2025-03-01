@@ -38,9 +38,16 @@ namespace hh_napi.Controllers
         public async Task<IActionResult> CreateDataPoint(int dataSourceId, [FromBody] DataPoint dataPoint)
         {
             dataPoint.DataSourceId = dataSourceId;
-            
+
             var success = await _dataPointService.CreateDataPointAsync(dataPoint);
             return success ? CreatedAtAction(nameof(GetDataPointById), new { dataSourceId = dataPoint.DataSourceId, id = dataPoint.Id }, dataPoint) : BadRequest();
+        }
+        
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteDataPoint(int dataSourceId, int id)
+        {
+            var success = await _dataPointService.DeleteDataPointAsync(id);
+            return success ? NoContent() : BadRequest();
         }
     }
 }

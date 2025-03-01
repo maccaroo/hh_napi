@@ -10,4 +10,5 @@ public interface IDataSourceService
     Task<PagedResponse<DataSource>> GetAllDataSourcesAsync(PaginationParams pagination, string? includeRelations = null);
     Task<bool> CreateDataSourceAsync(DataSource dataSource);
     Task<DataSourceSummary> GetDataSourceSummaryAsync(int id);
+    Task<bool> DeleteDataSourceAsync(int id);
 }
