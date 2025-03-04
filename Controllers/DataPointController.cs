@@ -3,12 +3,14 @@ using hh_napi.Domain;
 using hh_napi.Models;
 using hh_napi.Models.Responses;
 using hh_napi.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace hh_napi.Controllers
 {
     [ApiController]
     [Route("api/datasources/{dataSourceId}/datapoints")]
+    [Authorize]
     public class DataPointController : ControllerBase
     {
         private readonly IMapper _mapper;
@@ -42,7 +44,7 @@ namespace hh_napi.Controllers
             var success = await _dataPointService.CreateDataPointAsync(dataPoint);
             return success ? CreatedAtAction(nameof(GetDataPointById), new { dataSourceId = dataPoint.DataSourceId, id = dataPoint.Id }, dataPoint) : BadRequest();
         }
-        
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDataPoint(int dataSourceId, int id)
         {

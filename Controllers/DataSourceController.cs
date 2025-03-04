@@ -10,6 +10,7 @@ namespace hh_napi.Controllers
 {
     [ApiController]
     [Route("api/datasources")]
+    [Authorize]
     public class DataSourceController : ControllerBase
     {
         private readonly IMapper _mapper;
@@ -35,7 +36,6 @@ namespace hh_napi.Controllers
             return Ok(pagedDataSources.ConvertTo<DataSourceResponse>(_mapper));
         }
 
-        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateDataSource([FromBody] DataSource dataSource)
         {

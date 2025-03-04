@@ -2,14 +2,15 @@ using AutoMapper;
 using hh_napi.Domain;
 using hh_napi.Models;
 using hh_napi.Models.Responses;
-using hh_napi.Services;
 using hh_napi.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace hh_napi.Controllers
 {
     [ApiController]
     [Route("api/users")]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IMapper _mapper;
