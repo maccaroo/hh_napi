@@ -43,10 +43,15 @@ public static class MiddlewareConfiguration
         app.UseAuthentication();    // Ensures the request has a valid token before accessing secured routes
         app.UseAuthorization();     // Ensures the authenticated user has the right permissions
 
-        // OpenAPI
+        // OpenAPI (Swagger)
         if (app.Environment.IsDevelopment())
         {
-            app.MapOpenApi();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Home Historian API v1");
+                c.RoutePrefix = string.Empty; // Serve the Swagger UI at the app's root
+            });
         }
     }
 }
