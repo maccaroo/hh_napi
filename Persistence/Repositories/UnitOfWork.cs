@@ -11,13 +11,15 @@ public class UnitOfWork : IUnitOfWork
     public IDataSourceRepository DataSources { get; }
     public IUserRepository Users { get; }
     public IUserCredentialsRepository UserCredentials { get; }
+    public IRefreshTokenRepository RefreshTokens { get; }
 
     public UnitOfWork(
         AppDbContext context,
         IDataPointRepository dataPoints,
         IDataSourceRepository dataSources,
         IUserRepository users,
-        IUserCredentialsRepository userCredentials
+        IUserCredentialsRepository userCredentials,
+        IRefreshTokenRepository refreshTokens
         )
     {
         _context = context;
@@ -25,6 +27,7 @@ public class UnitOfWork : IUnitOfWork
         DataSources = dataSources;
         Users = users;
         UserCredentials = userCredentials;
+        RefreshTokens = refreshTokens;
     }
 
     public async Task<bool> SaveChangesAsync()

@@ -9,6 +9,7 @@ public class AppDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<DataSource> DataSources { get; set; } = null!;
     public DbSet<DataPoint> DataPoints { get; set; } = null!;
+    public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -20,6 +21,7 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<UserCredentials>().ToTable("UserCredentials", "hh");
         modelBuilder.Entity<DataSource>().ToTable("DataSources", "hh");
         modelBuilder.Entity<DataPoint>().ToTable("DataPoints", "hh");
+        modelBuilder.Entity<RefreshToken>().ToTable("RefreshTokens", "hh");
 
         // Setup relationships
         modelBuilder.Entity<DataSource>()
@@ -29,5 +31,11 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<DataPoint>()
             .HasOne(dp => dp.DataSource).WithMany(ds => ds.DataPoints)
             .HasForeignKey(dp => dp.DataSourceId).OnDelete(DeleteBehavior.Cascade);
+            
+        modelBuilder.Entity<RefreshToken>()
+            .HasOne(rt => rt.User)
+            .WithMany()
+            .HasForeignKey(rt => rt.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -27,7 +27,8 @@ public static class AuthenticationConfiguration
                     ValidAudience = jwtSettings["Audience"],
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+                    ClockSkew = TimeSpan.Zero // Remove default 5 minute clock skew to make token expiration more precise
                 };
             });
 

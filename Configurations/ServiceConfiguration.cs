@@ -48,6 +48,7 @@ public static class ServiceConfiguration
         services.AddScoped<IDataPointRepository, DataPointRepository>();
         services.AddScoped<IDataSourceRepository, DataSourceRepository>();
         services.AddScoped<IUserCredentialsRepository, UserCredentialsRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
         // UnitOfWork
         services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -56,6 +57,7 @@ public static class ServiceConfiguration
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IDataPointService, DataPointService>();
         services.AddScoped<IDataSourceService, DataSourceService>();
+        services.AddScoped<ITokenService, TokenService>();
 
         // AutoMapper
         services.AddAutoMapper(typeof(MappingProfile));
