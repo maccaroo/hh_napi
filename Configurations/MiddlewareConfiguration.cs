@@ -36,6 +36,9 @@ public static class MiddlewareConfiguration
         // Redirect to HTTPS
         app.UseHttpsRedirection();  // Ensures all requests are redirected to HTTPS before anything else
         
+        // Username-based rate limiting (must be before routing to ensure request body is available)
+        app.UseUsernameRateLimiting();
+        
         // Routing
         app.UseRouting();   // Must come before authentication and authorization for correct route matching
 

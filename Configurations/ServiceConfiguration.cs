@@ -58,6 +58,7 @@ public static class ServiceConfiguration
         services.AddScoped<IDataPointService, DataPointService>();
         services.AddScoped<IDataSourceService, DataSourceService>();
         services.AddScoped<ITokenService, TokenService>();
+        services.AddSingleton<ILoginAttemptService, LoginAttemptService>();
 
         // AutoMapper
         services.AddAutoMapper(typeof(MappingProfile));

@@ -4,6 +4,7 @@ using hh_napi.Services;
 using hh_napi.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 
 namespace hh_napi.Controllers
@@ -14,30 +15,40 @@ namespace hh_napi.Controllers
     {
         private readonly IUserService _userService;
         private readonly ITokenService _tokenService;
+        private readonly ILoginAttemptService _loginAttemptService;
         private readonly IConfiguration _config;
         private readonly ILogger<AuthController> _logger;
 
         public AuthController(
             IUserService userService, 
             ITokenService tokenService,
+            ILoginAttemptService loginAttemptService,
             IConfiguration config, 
             ILogger<AuthController> logger)
         {
             _userService = userService;
             _tokenService = tokenService;
+            _loginAttemptService = loginAttemptService;
             _config = config;
             _logger = logger;
         }
 
         [HttpPost("login")]
+        [EnableRateLimiting("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
         {
             User? user = await _userService.AuthenticateAsync(loginRequest.Username, loginRequest.Password);
             if (user == null)
             {
+                // Record failed login attempt
+                await _loginAttemptService.RecordFailedAttemptAsync(loginRequest.Username);
+                
                 _logger.LogWarning("Login attempt failed for username {Username}", loginRequest.Username);
-                return Unauthorized();
+                return Unauthorized(new { Message = "Invalid username or password" });
             }
+
+            // Record successful login attempt
+            await _loginAttemptService.RecordSuccessfulAttemptAsync(loginRequest.Username);
 
             var accessToken = _tokenService.GenerateAccessToken(user);
             var refreshToken = await _tokenService.CreateRefreshTokenAsync(user.Id);
@@ -56,6 +67,7 @@ namespace hh_napi.Controllers
         }
 
         [HttpPost("refresh")]
+        [EnableRateLimiting("login")]
         public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest request)
         {
             try
