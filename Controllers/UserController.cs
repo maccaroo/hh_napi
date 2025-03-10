@@ -11,6 +11,7 @@ namespace hh_napi.Controllers
     [ApiController]
     [Route("api/users")]
     [Authorize]
+    [ApiVersion("1.0")]
     public class UserController : ControllerBase
     {
         private readonly IMapper _mapper;

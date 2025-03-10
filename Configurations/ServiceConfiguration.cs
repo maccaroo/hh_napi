@@ -6,6 +6,10 @@ using hh_napi.Persistence.Repositories;
 using hh_napi.Persistence.Repositories.Interfaces;
 using hh_napi.Services;
 using hh_napi.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.OpenApi.Models;
 
 namespace hh_napi.Configurations;
 
@@ -63,35 +67,66 @@ public static class ServiceConfiguration
         // AutoMapper
         services.AddAutoMapper(typeof(MappingProfile));
 
+        // Versioning
+        services.AddApiVersioning(options =>
+        {
+            var apiVersionSettings = builder.Configuration.GetSection("ApiVersion");
+            
+            bool allowUnspecified = bool.TryParse(apiVersionSettings["AllowUnspecified"], out var unspecified) && unspecified;
+
+            string? defaultVersionString = apiVersionSettings["DefaultVersion"];
+            ApiVersion defaultApiVersion = new(1, 0);
+            if (!string.IsNullOrEmpty(defaultVersionString) && ApiVersion.TryParse(defaultVersionString, out var parsedVersion))
+            {
+                defaultApiVersion = parsedVersion;
+            }
+
+            options.ReportApiVersions = true;
+            options.AssumeDefaultVersionWhenUnspecified = allowUnspecified;
+            options.DefaultApiVersion = defaultApiVersion;
+            options.ApiVersionReader = new HeaderApiVersionReader("X-Api-Version");
+        });
+
+        services.AddVersionedApiExplorer(options =>
+        {
+            options.GroupNameFormat = "'v'VVV";
+            options.SubstituteApiVersionInUrl = true;
+        });
+
         // OpenAPI (Swagger)
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen(c =>
+        services.AddSwaggerGen(options =>
         {
-            c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+            var provider = services.BuildServiceProvider().GetRequiredService<IApiVersionDescriptionProvider>();
+
+            foreach (var description in provider.ApiVersionDescriptions)
             {
-                Title = "Home Historian API",
-                Version = "v1",
-                Description = "API for managing historical data points"
-            });
+                options.SwaggerDoc(description.GroupName, new OpenApiInfo
+                {
+                    Title = "Home Historian API",
+                    Version = description.ApiVersion.ToString(),
+                    Description = "API for managing historical data points"
+                });
+            }
 
             // Add JWT Authentication support to Swagger
-            c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
                 Name = "Authorization",
-                In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-                Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
                 Scheme = "Bearer"
             });
 
-            c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
-                    new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                    new OpenApiSecurityScheme
                     {
-                        Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                        Reference = new OpenApiReference
                         {
-                            Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                            Type = ReferenceType.SecurityScheme,
                             Id = "Bearer"
                         }
                     },

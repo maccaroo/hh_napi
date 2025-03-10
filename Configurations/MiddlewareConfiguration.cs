@@ -1,5 +1,6 @@
 using Serilog;
 using hh_napi.Middleware;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
 namespace hh_napi.Configurations;
 
@@ -49,11 +50,16 @@ public static class MiddlewareConfiguration
         // OpenAPI (Swagger)
         if (app.Environment.IsDevelopment())
         {
+            var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+
             app.UseSwagger();
-            app.UseSwaggerUI(c =>
+            app.UseSwaggerUI(options =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Home Historian API v1");
-                c.RoutePrefix = string.Empty; // Serve the Swagger UI at the app's root
+                foreach (var description in provider.ApiVersionDescriptions)
+                {
+                    options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", $"Home Historian API {description.ApiVersion}");
+                }
+                options.RoutePrefix = "swagger"; 
             });
         }
     }

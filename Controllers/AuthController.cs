@@ -11,6 +11,7 @@ namespace hh_napi.Controllers
 {
     [ApiController]
     [Route("api/auth")]
+    [ApiVersion("1.0")]
     public class AuthController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -20,10 +21,10 @@ namespace hh_napi.Controllers
         private readonly ILogger<AuthController> _logger;
 
         public AuthController(
-            IUserService userService, 
+            IUserService userService,
             ITokenService tokenService,
             ILoginAttemptService loginAttemptService,
-            IConfiguration config, 
+            IConfiguration config,
             ILogger<AuthController> logger)
         {
             _userService = userService;
@@ -42,7 +43,7 @@ namespace hh_napi.Controllers
             {
                 // Record failed login attempt
                 await _loginAttemptService.RecordFailedAttemptAsync(loginRequest.Username);
-                
+
                 _logger.LogWarning("Login attempt failed for username {Username}", loginRequest.Username);
                 return Unauthorized(new { Message = "Invalid username or password" });
             }
@@ -52,14 +53,14 @@ namespace hh_napi.Controllers
 
             var accessToken = _tokenService.GenerateAccessToken(user);
             var refreshToken = await _tokenService.CreateRefreshTokenAsync(user.Id);
-            
+
             var jwtSettings = _config.GetSection("JwtSettings");
             var expiresInSeconds = Convert.ToInt32(jwtSettings["AccessTokenExpiryMinutes"]) * 60;
-            
+
             _logger.LogInformation("Login successful for username {Username}", loginRequest.Username);
 
-            return Ok(new AuthResponse 
-            { 
+            return Ok(new AuthResponse
+            {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken.Token,
                 ExpiresIn = expiresInSeconds
@@ -73,14 +74,14 @@ namespace hh_napi.Controllers
             try
             {
                 var (accessToken, refreshToken) = await _tokenService.RefreshTokenAsync(
-                    request.AccessToken, 
+                    request.AccessToken,
                     request.RefreshToken);
-                    
+
                 var jwtSettings = _config.GetSection("JwtSettings");
                 var expiresInSeconds = Convert.ToInt32(jwtSettings["AccessTokenExpiryMinutes"]) * 60;
-                
-                return Ok(new AuthResponse 
-                { 
+
+                return Ok(new AuthResponse
+                {
                     AccessToken = accessToken,
                     RefreshToken = refreshToken.Token,
                     ExpiresIn = expiresInSeconds

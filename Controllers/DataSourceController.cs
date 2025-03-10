@@ -11,6 +11,7 @@ namespace hh_napi.Controllers
     [ApiController]
     [Route("api/datasources")]
     [Authorize]
+    [ApiVersion("1.0")]
     public class DataSourceController : ControllerBase
     {
         private readonly IMapper _mapper;
