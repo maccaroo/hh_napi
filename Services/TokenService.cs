@@ -25,7 +25,7 @@ public class TokenService : ITokenService
 
     public string GenerateAccessToken(User user)
     {
-        var jwtSettings = _configuration.GetSection("JwtSettings");
+        var jwtSettings = _configuration.GetSection("Jwt");
 
         var key = jwtSettings["Key"];
         if (string.IsNullOrEmpty(key))
@@ -61,7 +61,7 @@ public class TokenService : ITokenService
             UserId = userId,
             Token = GenerateRefreshTokenString(),
             ExpiryDate = DateTime.UtcNow.AddDays(
-                Convert.ToDouble(_configuration.GetSection("JwtSettings")["RefreshTokenExpiryDays"])),
+                Convert.ToDouble(_configuration.GetSection("Jwt")["RefreshTokenExpiryDays"])),
             CreatedAt = DateTime.UtcNow
         };
 
@@ -73,7 +73,7 @@ public class TokenService : ITokenService
 
     public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
     {
-        var jwtSettings = _configuration.GetSection("JwtSettings");
+        var jwtSettings = _configuration.GetSection("Jwt");
 
         var key = jwtSettings["Key"];
         if (string.IsNullOrEmpty(key))

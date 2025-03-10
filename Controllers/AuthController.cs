@@ -54,7 +54,7 @@ namespace hh_napi.Controllers
             var accessToken = _tokenService.GenerateAccessToken(user);
             var refreshToken = await _tokenService.CreateRefreshTokenAsync(user.Id);
 
-            var jwtSettings = _config.GetSection("JwtSettings");
+            var jwtSettings = _config.GetSection("Jwt");
             var expiresInSeconds = Convert.ToInt32(jwtSettings["AccessTokenExpiryMinutes"]) * 60;
 
             _logger.LogInformation("Login successful for username {Username}", loginRequest.Username);
@@ -77,7 +77,7 @@ namespace hh_napi.Controllers
                     request.AccessToken,
                     request.RefreshToken);
 
-                var jwtSettings = _config.GetSection("JwtSettings");
+                var jwtSettings = _config.GetSection("Jwt");
                 var expiresInSeconds = Convert.ToInt32(jwtSettings["AccessTokenExpiryMinutes"]) * 60;
 
                 return Ok(new AuthResponse

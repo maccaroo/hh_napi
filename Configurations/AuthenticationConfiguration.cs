@@ -8,7 +8,7 @@ public static class AuthenticationConfiguration
 {
     public static void ConfigureAuthentication(this WebApplicationBuilder builder)
     {
-        var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+        var jwtSettings = builder.Configuration.GetSection("Jwt");
 
         var key = jwtSettings["Key"];
         if (string.IsNullOrEmpty(key))

@@ -23,7 +23,7 @@ public class LoginAttemptService : ILoginAttemptService
     {
         _logger = logger;
         
-        var rateLimitSettings = configuration.GetSection("RateLimitSettings");
+        var rateLimitSettings = configuration.GetSection("RateLimit");
         _maxFailedAttempts = int.Parse(rateLimitSettings["LoginUsernameMaxFailedAttempts"] ?? "5");
         _lockoutDuration = TimeSpan.FromMinutes(int.Parse(rateLimitSettings["LoginUsernameLockoutDurationMinutes"] ?? "15"));
     }

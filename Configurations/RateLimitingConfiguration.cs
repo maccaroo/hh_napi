@@ -7,7 +7,7 @@ public static class RateLimitingConfiguration
 {
     public static void ConfigureRateLimiting(this WebApplicationBuilder builder)
     {
-        var rateLimitSettings = builder.Configuration.GetSection("RateLimitSettings");
+        var rateLimitSettings = builder.Configuration.GetSection("RateLimit");
         
         // Add rate limiting services
         builder.Services.AddRateLimiter(options =>
